@@ -15,24 +15,20 @@ An Agent has has the following properties:
 import numpy as np
 from abc import abstractmethod, ABC
 
-action_space = {'U': (-1,0), 'D': (1,0), 'L': (0,-1), 'R':(0,1)}
+
+action_space = {0: (1,0), 1: (0,-1), 2: (-1,0), 3:(0,1)}
 
 class Agent(ABC):
     @abstractmethod
     def __init__(self, states, alpha, random_factor):
         pass
 
-
     @abstractmethod
-    def choose_action(self, state, allowed_moves):
+    def choose_action(self, state):
         pass
 
     @abstractmethod
     def learn(self):
-        pass
-
-    @abstractmethod
-    def update_state_history(self, state, reward):
         pass
 
 
@@ -43,22 +39,25 @@ class MazeAgent(Agent):
         self.alpha = alpha
         self.G = {}
         self.random_factor = random_factor
-        self.init_reward(env.allowed_states)
+        self.init_reward(env)
+        self.env = env
 
-    def init_reward(self, states):
-        for state in states:
-            self.G[state] = np.random.uniform(low=-1.0, high=-0.1)
+    def init_reward(self, env):
+        for x in range(6):
+            for y in range(6):
+                self.G[(x, y)] = np.random.uniform(low=-1.0, high=-0.1)
+        print(self.G)
 
-    def choose_action(self, state, allowed_moves):
+    def choose_action(self, state):
         max_g = -10e15
         next_move = None
         random_n = np.random.random()
         if random_n < self.random_factor:
-            next_move = np.random.choice(allowed_moves)
+            next_move = np.random.randint(0,self.env.action_space.n)
         else:
-            for action in allowed_moves:
-                new_state = tuple([sum(x) for x in zip(state, action_space[action])])
-                if self.G[new_state] >= max_g:
+            for action in  action_space:
+                new_state = tuple([sum(x) for x in zip(state,action_space[action])])
+                if 0 <= new_state[0] <= 5 and 0 <= new_state[1] <= 5 and self.G[new_state] >= max_g:
                     next_move = action
                     max_g = self.G[new_state]
         return next_move
@@ -69,6 +68,8 @@ class MazeAgent(Agent):
         for prev, reward in reversed(self.state_history):
             self.G[prev] = self.G[prev] +  self.alpha * (target - self.G[prev])
             target += reward
+            print(prev, reward, target, self.G[prev])
+        print(self.G)
         self.state_history = []
         self.random_factor -= 10e-5
 
