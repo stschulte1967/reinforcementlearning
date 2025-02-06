@@ -111,7 +111,7 @@ class MazeWorldEnv(gym.Env):
         # An episode is done iff the agent has reached the target
         terminated = np.array_equal(self._agent_location, self._target_location)
         truncated = self.steps > 5000
-        reward = 1 if terminated else 0  # Binary sparse rewards
+        reward = 0 if terminated else -1  # Binary sparse rewards
         observation = self._get_obs()
         info = self._get_info()
 

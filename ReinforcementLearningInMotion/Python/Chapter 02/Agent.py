@@ -64,12 +64,12 @@ class MazeAgent(Agent):
 
     def learn(self):
         target = 0
-
+        print("state_history", self.state_history)
         for prev, reward in reversed(self.state_history):
             self.G[prev] = self.G[prev] +  self.alpha * (target - self.G[prev])
             target += reward
             print(prev, reward, target, self.G[prev])
-        print(self.G)
+        print(target,self.G)
         self.state_history = []
         self.random_factor -= 10e-5
 

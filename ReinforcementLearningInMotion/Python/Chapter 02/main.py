@@ -11,7 +11,7 @@ if __name__ == '__main__':
     move_history = []
     episode_over = False
 
-    for i in range(1):
+    for i in range(5000):
         observation, _ = maze.reset()
         episode_over = False
         steps = 0
